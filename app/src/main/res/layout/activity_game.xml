@@ -22,6 +22,24 @@
             android:layout_height="match_parent" />
     </LinearLayout>
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/user1"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="点我看你的单词"/>
+        <Button
+            android:id="@+id/user2"
+            android:layout_weight="0.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="点我看你的单词"/>
+    </LinearLayout>
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -38,6 +56,24 @@
             app:srcCompat="@android:drawable/ic_menu_camera"
             android:id="@+id/imageView4"
             android:layout_height="match_parent" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/user3"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="点我看你的单词"/>
+        <Button
+            android:id="@+id/user4"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:text="点我看你的单词"/>
     </LinearLayout>
 
 

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">谁是卧底</string>
+    <string name="introduce">这个版本允许4个人玩，点击开始游戏，然后开始拍个照，若出问题，只拍第4个即可，之后会出现查看自己的词的按钮。结束按钮有bug，不要点</string>
+</resources>

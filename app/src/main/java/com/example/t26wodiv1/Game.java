@@ -1,6 +1,10 @@
 package com.example.t26wodiv1;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -10,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,20 +24,31 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 import static android.R.attr.data;
 import static android.R.attr.defaultHeight;
 import static android.R.attr.switchMinWidth;
+import static com.example.t26wodiv1.DBHelper.TABLE_COLUMN_1;
+import static com.example.t26wodiv1.DBHelper.TABLE_COLUMN_2;
+import static com.example.t26wodiv1.DBHelper.TABLE_NAME;
 
 /**
  * Created by paul on 2/5/17.
  */
 
-public class Game extends FragmentActivity {
+public class Game extends Activity implements View.OnClickListener{
     private static final int REQUEST_PHOTO_1=1;
     private static final int REQUEST_PHOTO_2=2;
     private static final int REQUEST_PHOTO_3=3;
     private static final int REQUEST_PHOTO_4=4;
+    private final int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
+    private final int RANDOM_USER=(int)(1+Math.random()*4);
+    private static  String MAN_WORD=null;
+    private static  String SPY_WORD=null;
+    DBHelper mydb=new DBHelper(this);//Do I need to initial it explicitly?
+    private SQLiteDatabase dbReader;
+
 
     String photoPathSequence;
     String photoPaths;
@@ -41,6 +57,10 @@ public class Game extends FragmentActivity {
     private ImageView imageView3;
     private ImageView imageView4;
     private Button stop_button;
+    private Button query_button;
+    private String tmpString;
+    private Button user1,user2,user3,user4;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +70,19 @@ public class Game extends FragmentActivity {
         imageView3= (ImageView) findViewById(R.id.imageView3);
         imageView4= (ImageView) findViewById(R.id.imageView4);
         stop_button= (Button) findViewById(R.id.stop_game);
+        user1= (Button) findViewById(R.id.user1);
+        user2= (Button) findViewById(R.id.user2);
+        user3= (Button) findViewById(R.id.user3);
+        user4= (Button) findViewById(R.id.user4);
+        user1.setOnClickListener(this);
+        user2.setOnClickListener(this);
+        user3.setOnClickListener(this);
+        user4.setOnClickListener(this);
+        stop_button.setOnClickListener(this);
+        imageView1.setOnClickListener(this);
+        imageView2.setOnClickListener(this);
+        imageView3.setOnClickListener(this);
+        imageView4.setOnClickListener(this);
 
 
         imageView1.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua5));
@@ -57,40 +90,20 @@ public class Game extends FragmentActivity {
         imageView3.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua7));
         imageView4.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua8));
 
-        imageView1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               dispatchTakePictureIntent(REQUEST_PHOTO_1);
 
-            }
-        });
-        imageView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent(REQUEST_PHOTO_2);
-            }
-        });
-        imageView3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent(REQUEST_PHOTO_3);
-            }
-        });
-        imageView4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent(REQUEST_PHOTO_4);
-            }
-        });
-        stop_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        queryDatabaseForWord();
     }
 
-
+    private void queryDatabaseForWord() {
+        dbReader=mydb.getReadableDatabase();
+        Cursor cursor=dbReader.query(TABLE_NAME,null,null,null,null,null,null);
+        cursor.moveToPosition(RANDOM_PAIR);
+        //// TODO: 2/9/17 定位完成？大概吧，；总之开始取数据吧！
+        MAN_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_1));
+        SPY_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_2));
+        cursor.close();
+        dbReader.close();
+    }
 
 
     @Override
@@ -116,6 +129,10 @@ public class Game extends FragmentActivity {
                         break;
                     case REQUEST_PHOTO_4:
                         imageView4.setImageBitmap(bitmap);
+                        user1.setVisibility(View.VISIBLE);
+                        user2.setVisibility(View.VISIBLE);
+                        user3.setVisibility(View.VISIBLE);
+                        user4.setVisibility(View.VISIBLE);
                         break;
                     default:
                         break;
@@ -152,6 +169,95 @@ public class Game extends FragmentActivity {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
                 startActivityForResult(takePictureIntent,requestPhotoNum);
             }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.stop_game:
+                this.finish();
+
+            case R.id.imageView1:
+                dispatchTakePictureIntent(REQUEST_PHOTO_1);
+                break;
+            case R.id.imageView2:
+                dispatchTakePictureIntent(REQUEST_PHOTO_2);
+                break;
+            case R.id.imageView3:
+                dispatchTakePictureIntent(REQUEST_PHOTO_3);
+                break;
+            case R.id.imageView4:
+                dispatchTakePictureIntent(REQUEST_PHOTO_4);
+                break;
+
+            case R.id.user1:
+                if (1==RANDOM_USER){
+                    tmpString = SPY_WORD;
+                }else {
+                    tmpString=MAN_WORD;
+                }
+                new AlertDialog.Builder(Game.this).setTitle("your word is :")
+                        .setIconAttribute(android.R.attr.alertDialogIcon)
+                        .setMessage(tmpString)
+                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                break;
+            case R.id.user2:
+                if (2==RANDOM_USER){
+                    tmpString = SPY_WORD;
+                }else {
+                    tmpString=MAN_WORD;
+                }
+                new AlertDialog.Builder(Game.this).setTitle("your word is :")
+                        .setIconAttribute(android.R.attr.alertDialogIcon)
+                        .setMessage(tmpString)
+                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                break;
+            case R.id.user3:
+                if (3==RANDOM_USER){
+                    tmpString = SPY_WORD;
+                }else {
+                    tmpString=MAN_WORD;
+                }
+                new AlertDialog.Builder(Game.this).setTitle("your word is :")
+                        .setIconAttribute(android.R.attr.alertDialogIcon)
+                        .setMessage(tmpString)
+                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                break;
+            case R.id.user4:
+                if (4==RANDOM_USER){
+                    tmpString = SPY_WORD;
+                }else {
+                    tmpString=MAN_WORD;
+                }
+                Log.d("GameA",">>>>>>>>>>>Button4 Clicked and should have dialog show ");
+                new AlertDialog.Builder(Game.this).setTitle("your word is :")
+                        .setIconAttribute(android.R.attr.alertDialogIcon)
+                        .setMessage(tmpString)
+                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+                break;
+
+
         }
     }
 
