@@ -1,97 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="com.example.t26wodiv1.Game">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/id_recyclerview"
+        android:divider="#ffff0000"
+        android:dividerHeight="10dp"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.4">
-        <ImageView
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            app:srcCompat="@android:drawable/ic_menu_camera"
-            android:id="@+id/imageView1"
-            android:layout_height="match_parent" />
-        <ImageView
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            app:srcCompat="@android:drawable/ic_menu_camera"
-            android:id="@+id/imageView2"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/user1"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:text="点我看你的单词"/>
-        <Button
-            android:id="@+id/user2"
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:text="点我看你的单词"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.4">
-        <ImageView
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            app:srcCompat="@android:drawable/ic_menu_camera"
-            android:id="@+id/imageView3"
-            android:layout_height="match_parent" />
-        <ImageView
-            android:layout_weight="0.5"
-            android:layout_width="0dp"
-            app:srcCompat="@android:drawable/ic_menu_camera"
-            android:id="@+id/imageView4"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/user3"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:text="点我看你的单词"/>
-        <Button
-            android:id="@+id/user4"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:text="点我看你的单词"/>
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.2">
-        <Button
-            android:id="@+id/stop_game"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="结束游戏"/>
-
-
-    </LinearLayout>
-
-
-
-
-</LinearLayout>
+        android:layout_height="match_parent"/>
+</RelativeLayout>
