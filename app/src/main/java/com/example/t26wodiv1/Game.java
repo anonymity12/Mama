@@ -46,10 +46,6 @@ public class Game extends Activity {
     private RecyclerView mRecyclerView;
     private List<String> mDatas;
     private StaggeredHomeAdapter mAdapter;
-    private static final int REQUEST_PHOTO_1=1;
-    private static final int REQUEST_PHOTO_2=2;
-    private static final int REQUEST_PHOTO_3=3;
-    private static final int REQUEST_PHOTO_4=4;
     private int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
     private static int RANDOM_USER=0;
     private static  String MAN_WORD=null;

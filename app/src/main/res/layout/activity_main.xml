@@ -44,7 +44,7 @@
             android:id="@+id/man_word"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="贫民的词语"
+            android:hint="平民的词语"
             android:text="蠢货"/>
     </LinearLayout>
     <Button
