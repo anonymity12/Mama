@@ -7,10 +7,37 @@
 
     tools:context="com.example.t26wodiv1.Game">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/id_recyclerview"
-        android:divider="#ffff0000"
-        android:dividerHeight="10dp"
+    <FrameLayout
+        android:id="@+id/recycler_view_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="0.9">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/id_recyclerview"
+            android:divider="#ffff0000"
+            android:dividerHeight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_below="@+id/recycler_view_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="0.1">
+        <Button
+            android:id="@+id/game_btn_query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="看看卧底"/>
+        <Button
+
+            android:id="@+id/game_btn_finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="结束这盘"/>
+    </LinearLayout>
+
 </RelativeLayout>

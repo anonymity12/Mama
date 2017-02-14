@@ -15,15 +15,18 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -47,75 +50,106 @@ public class Game extends Activity {
     private static final int REQUEST_PHOTO_2=2;
     private static final int REQUEST_PHOTO_3=3;
     private static final int REQUEST_PHOTO_4=4;
-    private final int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
-    private final int RANDOM_USER=(int)(1+Math.random()*4);
+    private int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
+    private static int RANDOM_USER=0;
     private static  String MAN_WORD=null;
     private static  String SPY_WORD=null;
     DBHelper mydb=new DBHelper(this);//Do I need to initial it explicitly?
     private SQLiteDatabase dbReader;
+    private int user_count=4;
+    private Button query_button;
+    private Button finish_button;
 
 
-    String photoPathSequence;
-    String photoPaths;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        query_button= (Button) findViewById(R.id.game_btn_query);
+        query_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(Game.this,"玩家   "+(RANDOM_USER+1)+"   是卧底！！",Toast.LENGTH_SHORT).show();
+            }
+        });
+        finish_button= (Button) findViewById(R.id.game_btn_finish);
+        finish_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        Bundle  extras=getIntent().getExtras();
+        user_count=extras.getInt("user_count");
+        MAN_WORD=extras.getString("man_word");
+        SPY_WORD=extras.getString("spy_word");
+        //如果是“笨蛋”则说明默认未改变，应从数据库查询数据
+        //同时，如果因为MainActivity的那个Edittext不可见，而导致“笨蛋”为“”（即空），也要从数据库查询
+        if ((SPY_WORD.equals("笨蛋"))||(SPY_WORD.equals(""))){
+            queryDatabaseForAWord();
+        }
+        shapeUsersInterface();
+        RANDOM_USER=(int)(Math.random()*user_count);
+        mRecyclerView= (RecyclerView) findViewById(R.id.id_recyclerview);
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this,3));
+//        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4,StaggeredGridLayoutManager.VERTICAL));
+        mAdapter=new StaggeredHomeAdapter(this,mDatas);
+        mRecyclerView.setAdapter(mAdapter);
 
 
 
 
+//        queryDatabaseForAWord();
+        initEvent();
+    }
+    private void initEvent(){
+        mAdapter.setOnItemClickListener(new StaggeredHomeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (position==RANDOM_USER){
+                    Toast.makeText(Game.this,"玩家 "+(position+1)+"的词语是："+SPY_WORD,Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(Game.this,"玩家 "+(position+1)+"的词语是："+MAN_WORD,Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        queryDatabaseForWord();
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (position==RANDOM_USER){
+                    Toast.makeText(Game.this,"玩家"+(position+1)+"    是卧底，游戏结束",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(Game.this,"玩家"+(position+1)+"    不是卧底，游戏继续",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
-    private void queryDatabaseForWord() {
+    private void queryDatabaseForAWord() {
         dbReader=mydb.getReadableDatabase();
         Cursor cursor=dbReader.query(TABLE_NAME,null,null,null,null,null,null);
         cursor.moveToPosition(RANDOM_PAIR);
+        Log.d("GameA",">>>>>>> RANDOM_PAIR is:  "+RANDOM_PAIR);
         //// TODO: 2/9/17 定位完成？大概吧，；总之开始取数据吧！
         MAN_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_1));
         SPY_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_2));
         cursor.close();
         dbReader.close();
     }
-
-
-
-
-
-    private File createImageFile() throws IOException {
-        //Create an image file name;
-        String timeStamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName="JPEG_"+timeStamp+"_";
-        File storageDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image=File.createTempFile(imageFileName,".jpg",storageDir);
-        //save a file:path for use with ACTION_VIEW intents
-        photoPaths=image.getAbsolutePath();
-        Log.d("In Main",">>>>>>>>Created Image file!!"+photoPaths);
-
-        return image;
-    }
-    private void dispatchTakePictureIntent(int requestPhotoNum){
-        Intent takePictureIntent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager())!=null){
-            //Create the File where the photo should go
-            File photoFile=null;
-            try{
-                photoFile=createImageFile();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            //Continue only if the File was successfully created
-            if (photoFile!=null){
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent,requestPhotoNum);
-            }
+    protected void shapeUsersInterface(){
+        mDatas=new ArrayList<>();
+        for (int i=1;i<=user_count;i++){
+            mDatas.add(""+i);
         }
     }
+
+
+
+
+
 
 
 
