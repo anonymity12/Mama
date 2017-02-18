@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">郑庄寨卧底</string>
     <string name="introduce">这个版本允许任意个人玩，请在输入框输入玩家人数，点击开始游戏即可,若要自定义词语，请点击自定义游戏，然后输入词语后点击开始游戏</string>
-    <string name="custom_word_intro">请在下面的输入框内输入两个词语：</string>
+    <string name="custom_word_intro">请在下面的输入框内输入两个你自己的词语：</string>
+    <string name="game_instruction">游戏按钮说明：\n    当有裁判时，请裁判点击“看看卧底”，当没有裁判时，请玩家自行长按投出的卧底的号码，
+        将会弹出提示告诉你所投玩家是否为卧底，
+        游戏是否继续</string>
 </resources>

@@ -17,16 +17,37 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/introduce" />
-    <EditText
+    <LinearLayout
+        android:id="@+id/player_count"
         android:layout_below="@+id/text_intro"
-        android:id="@+id/edit_text_main"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="4"/>
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/idle_text0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:text="我们有"/><EditText
+            android:id="@+id/edit_text_main"
+            android:layout_weight="0.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="4"/>
+        <TextView
+            android:id="@+id/idle_text1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="个人玩"/>
+
+    </LinearLayout>
+
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/main_empty_layout"
-        android:layout_below="@+id/edit_text_main"
+        android:layout_below="@+id/player_count"
         android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="200dp">
@@ -52,14 +73,13 @@
         android:layout_below="@+id/main_empty_layout"
         android:layout_centerHorizontal="true"
         android:onClick="onClick"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="开始游戏"/>
     <Button
         android:id="@+id/custom_game"
-        android:layout_below="@+id/main_empty_layout"
-        android:layout_toRightOf="@+id/start_game_button"
-        android:layout_width="wrap_content"
+        android:layout_below="@+id/start_game_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="自定义游戏"/>
 </RelativeLayout>

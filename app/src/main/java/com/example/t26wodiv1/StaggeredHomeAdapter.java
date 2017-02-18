@@ -1,6 +1,8 @@
 package com.example.t26wodiv1;
 
 import android.content.Context;
+import android.text.LoginFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +47,7 @@ public class StaggeredHomeAdapter extends RecyclerView.Adapter<StaggeredHomeAdap
         //Obtains the LayoutInflater from the given context.
         mInflater = LayoutInflater.from(context);
         mDatas = datas;
+        Log.d("GameA",">>>>>>>>>>>the datas.size is : "+mDatas.size());
 
         //initialize the mHeight variable for each mDatas.
         mHeights = new ArrayList<Integer>();
@@ -95,7 +98,7 @@ public class StaggeredHomeAdapter extends RecyclerView.Adapter<StaggeredHomeAdap
                 {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                    removeData(pos);
+//                    removeData(pos);
                     return false;
                 }
             });
