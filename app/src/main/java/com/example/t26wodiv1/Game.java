@@ -15,15 +15,22 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import static android.R.attr.data;
@@ -37,257 +44,111 @@ import static com.example.t26wodiv1.DBHelper.TABLE_NAME;
  * Created by paul on 2/5/17.
  */
 
-public class Game extends Activity implements View.OnClickListener{
-    private static final int REQUEST_PHOTO_1=1;
-    private static final int REQUEST_PHOTO_2=2;
-    private static final int REQUEST_PHOTO_3=3;
-    private static final int REQUEST_PHOTO_4=4;
-    private final int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
-    private final int RANDOM_USER=(int)(1+Math.random()*4);
+public class Game extends Activity {
+    private RecyclerView mRecyclerView;
+    private List<String> mDatas;
+    private StaggeredHomeAdapter mAdapter;
+    private int RANDOM_PAIR=(int)(0+Math.random()*12);//Make sure it's 12 instead of 11;
+    private static int RANDOM_USER=0;
     private static  String MAN_WORD=null;
     private static  String SPY_WORD=null;
     DBHelper mydb=new DBHelper(this);//Do I need to initial it explicitly?
     private SQLiteDatabase dbReader;
-
-
-    String photoPathSequence;
-    String photoPaths;
-    private ImageView imageView1;
-    private ImageView imageView2;
-    private ImageView imageView3;
-    private ImageView imageView4;
-    private Button stop_button;
+    private int user_count=4;
     private Button query_button;
-    private String tmpString;
-    private Button user1,user2,user3,user4;
+    private Button finish_button;
+
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        imageView1= (ImageView) findViewById(R.id.imageView1);
-        imageView2= (ImageView) findViewById(R.id.imageView2);
-        imageView3= (ImageView) findViewById(R.id.imageView3);
-        imageView4= (ImageView) findViewById(R.id.imageView4);
-        stop_button= (Button) findViewById(R.id.stop_game);
-        user1= (Button) findViewById(R.id.user1);
-        user2= (Button) findViewById(R.id.user2);
-        user3= (Button) findViewById(R.id.user3);
-        user4= (Button) findViewById(R.id.user4);
-        user1.setOnClickListener(this);
-        user2.setOnClickListener(this);
-        user3.setOnClickListener(this);
-        user4.setOnClickListener(this);
-        stop_button.setOnClickListener(this);
-        imageView1.setOnClickListener(this);
-        imageView2.setOnClickListener(this);
-        imageView3.setOnClickListener(this);
-        imageView4.setOnClickListener(this);
+        query_button= (Button) findViewById(R.id.game_btn_query);
+        query_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(Game.this,"玩家   "+(RANDOM_USER+1)+"   是卧底！！",Toast.LENGTH_SHORT).show();
+            }
+        });
+        finish_button= (Button) findViewById(R.id.game_btn_finish);
+        finish_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        Bundle  extras=getIntent().getExtras();
+        user_count=extras.getInt("user_count");
+        MAN_WORD=extras.getString("man_word");
+        SPY_WORD=extras.getString("spy_word");
+        //如果是“笨蛋”则说明默认未改变，应从数据库查询数据
+        //同时，如果因为MainActivity的那个Edittext不可见，而导致“笨蛋”为“”（即空），也要从数据库查询
+        if ((SPY_WORD.equals("笨蛋"))||(SPY_WORD.equals(""))){
+            queryDatabaseForAWord();
+        }
+        shapeUsersInterface();
+        RANDOM_USER=(int)(Math.random()*user_count);
+        mRecyclerView= (RecyclerView) findViewById(R.id.id_recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(this,3));
+//        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4,StaggeredGridLayoutManager.VERTICAL));
+        mAdapter=new StaggeredHomeAdapter(this,mDatas);
+        mRecyclerView.setAdapter(mAdapter);
 
 
-        imageView1.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua5));
-        imageView2.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua6));
-        imageView3.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua7));
-        imageView4.setImageDrawable(getResources().getDrawable(R.drawable.shuzi_hua8));
 
 
-        queryDatabaseForWord();
+//        queryDatabaseForAWord();
+        initEvent();
+    }
+    private void initEvent(){
+        mAdapter.setOnItemClickListener(new StaggeredHomeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (position==RANDOM_USER){
+                    Toast.makeText(Game.this,"玩家 "+(position+1)+"的词语是："+SPY_WORD,Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(Game.this,"玩家 "+(position+1)+"的词语是："+MAN_WORD,Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (position==RANDOM_USER){
+                    Toast.makeText(Game.this,"玩家"+(position+1)+"    是卧底，游戏结束",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(Game.this,"玩家"+(position+1)+"    不是卧底，游戏继续",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
-    private void queryDatabaseForWord() {
+    private void queryDatabaseForAWord() {
         dbReader=mydb.getReadableDatabase();
         Cursor cursor=dbReader.query(TABLE_NAME,null,null,null,null,null,null);
         cursor.moveToPosition(RANDOM_PAIR);
+        Log.d("GameA",">>>>>>> RANDOM_PAIR is:  "+RANDOM_PAIR);
         //// TODO: 2/9/17 定位完成？大概吧，；总之开始取数据吧！
         MAN_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_1));
         SPY_WORD=cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_2));
         cursor.close();
         dbReader.close();
     }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode==RESULT_OK){
-            Log.d("GameA",">>>>>>>>>onResult!!OK!!");
-            Bitmap cameraBitmap=BitmapFactory.decodeFile(photoPaths);
-            if (cameraBitmap!=null){
-                int scale=ImageThumbnail.reckonThumbnail(cameraBitmap.getWidth(),cameraBitmap.getHeight(),500,500);
-                Bitmap bitmap=ImageThumbnail.PicZoom(cameraBitmap,cameraBitmap.getWidth()/scale,cameraBitmap.getHeight()/scale);
-                cameraBitmap.recycle();
-                Log.d("GameA",">>>>>>>>>>>>setting imageX bitmap");
-                switch (requestCode){
-                    case REQUEST_PHOTO_1:
-                        imageView1.setImageBitmap(bitmap);
-                        break;
-                    case REQUEST_PHOTO_2:
-                        imageView2.setImageBitmap(bitmap);
-                        break;
-                    case REQUEST_PHOTO_3:
-                        imageView3.setImageBitmap(bitmap);
-                        break;
-                    case REQUEST_PHOTO_4:
-                        imageView4.setImageBitmap(bitmap);
-                        user1.setVisibility(View.VISIBLE);
-                        user2.setVisibility(View.VISIBLE);
-                        user3.setVisibility(View.VISIBLE);
-                        user4.setVisibility(View.VISIBLE);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        //Create an image file name;
-        String timeStamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName="JPEG_"+timeStamp+"_";
-        File storageDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image=File.createTempFile(imageFileName,".jpg",storageDir);
-        //save a file:path for use with ACTION_VIEW intents
-        photoPaths=image.getAbsolutePath();
-        Log.d("In Main",">>>>>>>>Created Image file!!"+photoPaths);
-
-        return image;
-    }
-    private void dispatchTakePictureIntent(int requestPhotoNum){
-        Intent takePictureIntent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager())!=null){
-            //Create the File where the photo should go
-            File photoFile=null;
-            try{
-                photoFile=createImageFile();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            //Continue only if the File was successfully created
-            if (photoFile!=null){
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent,requestPhotoNum);
-            }
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.stop_game:
-                this.finish();
-
-            case R.id.imageView1:
-                dispatchTakePictureIntent(REQUEST_PHOTO_1);
-                break;
-            case R.id.imageView2:
-                dispatchTakePictureIntent(REQUEST_PHOTO_2);
-                break;
-            case R.id.imageView3:
-                dispatchTakePictureIntent(REQUEST_PHOTO_3);
-                break;
-            case R.id.imageView4:
-                dispatchTakePictureIntent(REQUEST_PHOTO_4);
-                break;
-
-            case R.id.user1:
-                if (1==RANDOM_USER){
-                    tmpString = SPY_WORD;
-                }else {
-                    tmpString=MAN_WORD;
-                }
-                new AlertDialog.Builder(Game.this).setTitle("your word is :")
-                        .setIconAttribute(android.R.attr.alertDialogIcon)
-                        .setMessage(tmpString)
-                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-                break;
-            case R.id.user2:
-                if (2==RANDOM_USER){
-                    tmpString = SPY_WORD;
-                }else {
-                    tmpString=MAN_WORD;
-                }
-                new AlertDialog.Builder(Game.this).setTitle("your word is :")
-                        .setIconAttribute(android.R.attr.alertDialogIcon)
-                        .setMessage(tmpString)
-                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-                break;
-            case R.id.user3:
-                if (3==RANDOM_USER){
-                    tmpString = SPY_WORD;
-                }else {
-                    tmpString=MAN_WORD;
-                }
-                new AlertDialog.Builder(Game.this).setTitle("your word is :")
-                        .setIconAttribute(android.R.attr.alertDialogIcon)
-                        .setMessage(tmpString)
-                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-                break;
-            case R.id.user4:
-                if (4==RANDOM_USER){
-                    tmpString = SPY_WORD;
-                }else {
-                    tmpString=MAN_WORD;
-                }
-                Log.d("GameA",">>>>>>>>>>>Button4 Clicked and should have dialog show ");
-                new AlertDialog.Builder(Game.this).setTitle("your word is :")
-                        .setIconAttribute(android.R.attr.alertDialogIcon)
-                        .setMessage(tmpString)
-                        .setPositiveButton("Got it !!!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-                break;
-
-
+    protected void shapeUsersInterface(){
+        mDatas=new ArrayList<>();
+        for (int i=1;i<=user_count;i++){
+            mDatas.add(""+i);
         }
     }
 
 
-    /*
-    * Following code cite from google docs online
-    * I copied and modified it and make use of it for myself ,the
-    * code above the the modified version.
-    * */
-/*    private void setPic(){
-        //Get the dimension of the view
-        int targetW=imageView.getWidth();
-        int targetH=imageView.getHeight();
 
-        //Get the dimension of the bitmap
-        BitmapFactory.Options bmOptions=new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds=true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath,bmOptions);
-        int photoW=bmOptions.outWidth;
-        int photoH=bmOptions.outHeight;
 
-        //Determine how much to scale down the image
-        int scaleFactor=Math.min(photoW/targetW,photoH/targetH);
 
-        //Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds=false;
-        bmOptions.inSampleSize=scaleFactor;
-        bmOptions.inPurgeable=true;
 
-        Bitmap bitmap=BitmapFactory.decodeFile(mCurrentPhotoPath,bmOptions);
-        imageView.setImageBitmap(bitmap);
-    }*/
+
+
 }
