@@ -3,14 +3,24 @@
 
 <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=22653262&auto=1&height=66"></iframe>
 
+我们此生一切快乐的时光，都从妈妈这里开始
+
 ![2023-02-11-19-14-16](https://picgorepo.oss-cn-beijing.aliyuncs.com/2023-02-11-19-14-16.png)
 
-天再高，高不过妈妈的怀抱；海再深，深不过妈妈的牵挂；路再远，仍想起妈妈叮嘱的话。您给了我们生命；您给了我们温暖；您给了我们道理；您给了我们希望；您给了伟大的母爱。
+![2023-02-11-19-33-43](https://picgorepo.oss-cn-beijing.aliyuncs.com/2023-02-11-19-33-43.png)
+
+
+小时候，妈妈托起的是婴儿，大了，妈妈托起的是生活
 
 ![2023-02-11-19-15-01](https://picgorepo.oss-cn-beijing.aliyuncs.com/2023-02-11-19-15-01.png)
-无论儿女 在外总是想着自己的父母，因为父母才是他们最温暖的港湾。  
+
+
 ![2023-02-11-19-15-16](https://picgorepo.oss-cn-beijing.aliyuncs.com/2023-02-11-19-15-16.png)
- 孩子大了 你们也该享受自己的生活了，你们要知道： 只有父母过得快乐安逸 当儿女的才会开心 才会放心。
+
+最美最强大的，永远是母亲。
+
+时光荏苒，请您也多关注自己的生活和健康，慢慢把托起生活的能量，慢慢转到儿女身上，相信我们能慢慢长成独立的大孩子
+
 ![2023-02-11-19-15-34](https://picgorepo.oss-cn-beijing.aliyuncs.com/2023-02-11-19-15-34.png)
 
 
